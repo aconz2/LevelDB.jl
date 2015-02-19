@@ -21,11 +21,17 @@ export db_range
 export range_close
 
 
-function open_db(file_path, create_if_missing)
+function open_db(file_path, create_if_missing, cache_size::Csize_t=0)
     options = ccall( (:leveldb_options_create, libleveldbjl), Ptr{Void}, ())
     if create_if_missing
         ccall( (:leveldb_options_set_create_if_missing, libleveldbjl), Void,
               (Ptr{Void}, Uint8), options, 1)
+    end
+    if cache_size > 0 
+        cache = ccall( (:leveldb_cache_create_lru, libleveldbjl), Ptr{Void},
+                       (Csize_t,), cache_size)
+        ccall( (:leveldb_options_set_cache, libleveldbjl), Void,
+               (Ptr{Void}, Ptr{Void}), options, cache)
     end
     err = Ptr{Uint8}[0]
     db = ccall( (:leveldb_open, libleveldbjl), Ptr{Void},

@@ -1,7 +1,7 @@
 using LevelDB
 using Base.Test
 
-db = open_db("level.db", true)
+db = open_db("level.db", true, convert(Csize_t, 1024 * 1024 * 10))
 batch = create_write_batch()
 val = "value10"
 batch_put(batch, "key1", val, length(val))
